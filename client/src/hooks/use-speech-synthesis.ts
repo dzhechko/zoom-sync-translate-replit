@@ -29,7 +29,37 @@ export const useSpeechSynthesis = () => {
     };
   }, [isSupported]);
 
-  const speak = useCallback((text: string, voiceURI?: string, rate: number = 1.0) => {
+  const findVoiceByLanguage = useCallback((targetLanguage: string) => {
+    const availableVoices = speechSynthesis.getVoices();
+    
+    // Language code mapping for better voice selection
+    const languageMap: Record<string, string[]> = {
+      'zh': ['zh-CN', 'zh-TW', 'zh-HK', 'zh'],
+      'ja': ['ja-JP', 'ja'],
+      'ko': ['ko-KR', 'ko'],
+      'en': ['en-US', 'en-GB', 'en-AU', 'en'],
+      'ru': ['ru-RU', 'ru'],
+      'es': ['es-ES', 'es-MX', 'es'],
+      'fr': ['fr-FR', 'fr-CA', 'fr'],
+      'de': ['de-DE', 'de'],
+      'it': ['it-IT', 'it'],
+      'pt': ['pt-PT', 'pt-BR', 'pt']
+    };
+
+    const possibleCodes = languageMap[targetLanguage] || [targetLanguage];
+    
+    // Try to find a voice that matches the target language
+    for (const code of possibleCodes) {
+      const voice = availableVoices.find(v => v.lang.startsWith(code));
+      if (voice) {
+        return voice;
+      }
+    }
+    
+    return null;
+  }, []);
+
+  const speak = useCallback((text: string, voiceURI?: string, rate: number = 1.0, targetLanguage?: string) => {
     if (!isSupported || !text.trim()) return;
 
     // Cancel any ongoing speech
@@ -38,18 +68,24 @@ export const useSpeechSynthesis = () => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = rate;
 
+    // If a specific voice is selected and it's not default, use it
     if (voiceURI && voiceURI !== 'default') {
-      const selectedVoice = voices.find(voice => voice.voiceURI === voiceURI);
-      if (selectedVoice) {
-        const speechVoice = speechSynthesis.getVoices().find(v => v.voiceURI === voiceURI);
-        if (speechVoice) {
-          utterance.voice = speechVoice;
-        }
+      const speechVoice = speechSynthesis.getVoices().find(v => v.voiceURI === voiceURI);
+      if (speechVoice) {
+        utterance.voice = speechVoice;
+      }
+    } 
+    // Otherwise, try to find a voice that matches the target language
+    else if (targetLanguage) {
+      const autoVoice = findVoiceByLanguage(targetLanguage);
+      if (autoVoice) {
+        utterance.voice = autoVoice;
+        utterance.lang = autoVoice.lang;
       }
     }
 
     speechSynthesis.speak(utterance);
-  }, [isSupported, voices]);
+  }, [isSupported, findVoiceByLanguage]);
 
   const stop = useCallback(() => {
     if (isSupported) {

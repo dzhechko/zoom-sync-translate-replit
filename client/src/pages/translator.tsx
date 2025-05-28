@@ -76,7 +76,7 @@ export default function TranslatorPage() {
         
         // Auto-play translation if enabled
         if (settings.autoPlay && response.translatedText) {
-          speak(response.translatedText, settings.voice, settings.speechRate);
+          speak(response.translatedText, settings.voice, settings.speechRate, settings.targetLanguage);
         }
       } else {
         setSegments(prev => prev.map(segment => 
