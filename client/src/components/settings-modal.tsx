@@ -16,6 +16,7 @@ interface SettingsModalProps {
   language: 'ru' | 'en';
   settings: TranslationSettings;
   voices: SpeechVoice[];
+  getVoicesForLanguage: (targetLanguage: string) => SpeechVoice[];
   onSave: (settings: TranslationSettings) => void;
   onClose: () => void;
 }
@@ -25,6 +26,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   language,
   settings,
   voices,
+  getVoicesForLanguage,
   onSave,
   onClose
 }) => {

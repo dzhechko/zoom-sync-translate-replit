@@ -25,6 +25,8 @@ export interface Translation {
   settings: {
     title: string;
     translation: string;
+    sourceLanguage: string;
+    targetLanguage: string;
     voice: string;
     speechRate: string;
     aiModel: string;
@@ -101,6 +103,8 @@ export const translations: Record<string, Translation> = {
     settings: {
       title: 'Настройки',
       translation: 'Настройки перевода',
+      sourceLanguage: 'Исходный язык',
+      targetLanguage: 'Целевой язык',
       voice: 'Голос для озвучивания',
       speechRate: 'Скорость речи',
       aiModel: 'Настройки ИИ модели',
@@ -175,6 +179,8 @@ export const translations: Record<string, Translation> = {
     settings: {
       title: 'Settings',
       translation: 'Translation Settings',
+      sourceLanguage: 'Source Language',
+      targetLanguage: 'Target Language',
       voice: 'Speech Voice',
       speechRate: 'Speech Rate',
       aiModel: 'AI Model Settings',

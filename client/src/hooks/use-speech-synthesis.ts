@@ -93,10 +93,34 @@ export const useSpeechSynthesis = () => {
     }
   }, [isSupported]);
 
+  const getVoicesForLanguage = useCallback((targetLanguage: string) => {
+    // Language code mapping for voice filtering
+    const languageMap: Record<string, string[]> = {
+      'zh': ['zh-CN', 'zh-TW', 'zh-HK', 'zh'],
+      'ja': ['ja-JP', 'ja'],
+      'ko': ['ko-KR', 'ko'],
+      'en': ['en-US', 'en-GB', 'en-AU', 'en'],
+      'ru': ['ru-RU', 'ru'],
+      'es': ['es-ES', 'es-MX', 'es'],
+      'fr': ['fr-FR', 'fr-CA', 'fr'],
+      'de': ['de-DE', 'de'],
+      'it': ['it-IT', 'it'],
+      'pt': ['pt-PT', 'pt-BR', 'pt']
+    };
+
+    const possibleCodes = languageMap[targetLanguage] || [targetLanguage];
+    
+    // Filter voices that match the target language
+    return voices.filter(voice => 
+      possibleCodes.some(code => voice.lang.startsWith(code))
+    );
+  }, [voices]);
+
   return {
     voices,
     isSupported,
     speak,
-    stop
+    stop,
+    getVoicesForLanguage
   };
 };
