@@ -48,7 +48,7 @@ export default function TranslatorPage() {
   const [retryCount, setRetryCount] = useState(0);
 
   // Hooks
-  const { voices, speak } = useSpeechSynthesis();
+  const { voices, speak, getVoicesForLanguage } = useSpeechSynthesis();
   
   const handleSpeechResult = useCallback((text: string) => {
     const newSegment: TranscriptionSegment = {
@@ -445,6 +445,7 @@ export default function TranslatorPage() {
         language={uiLanguage}
         settings={settings}
         voices={voices}
+        getVoicesForLanguage={getVoicesForLanguage}
         onSave={setSettings}
         onClose={() => setShowSettings(false)}
       />

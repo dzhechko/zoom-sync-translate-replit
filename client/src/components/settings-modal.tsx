@@ -130,14 +130,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="default">Системный голос по умолчанию</SelectItem>
-                    {voices.map(voice => (
+                    <SelectItem value="default">
+                      {language === 'ru' ? 'Автоматический выбор голоса' : 'Auto-select voice'}
+                    </SelectItem>
+                    {getVoicesForLanguage(localSettings.targetLanguage).map(voice => (
                       <SelectItem key={voice.voiceURI} value={voice.voiceURI}>
                         {voice.name} ({voice.lang})
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {language === 'ru' 
+                    ? 'Показаны только голоса для выбранного целевого языка' 
+                    : 'Only voices for selected target language are shown'}
+                </p>
               </div>
               
               <div>
