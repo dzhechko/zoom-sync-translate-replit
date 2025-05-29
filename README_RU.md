@@ -33,7 +33,86 @@
 
 ## Архитектура
 
-### Фронтенд
+### Диаграмма системной архитектуры
+
+```mermaid
+graph TB
+    subgraph "Браузерная среда"
+        UI[React Фронтенд]
+        MIC[Микрофон]
+        SPEAKERS[Динамики]
+        STORAGE[localStorage]
+        
+        subgraph "Web API"
+            WSR[Web Speech Recognition API]
+            WSS[Web Speech Synthesis API]
+        end
+    end
+    
+    subgraph "Сервер приложения"
+        EXPRESS[Express.js Сервер]
+        ROUTES[API Маршруты]
+    end
+    
+    subgraph "Внешние сервисы"
+        OPENAI[OpenAI API]
+    end
+    
+    MIC --> WSR
+    WSR --> UI
+    UI --> EXPRESS
+    EXPRESS --> ROUTES
+    ROUTES --> OPENAI
+    OPENAI --> ROUTES
+    ROUTES --> EXPRESS
+    EXPRESS --> UI
+    UI --> WSS
+    WSS --> SPEAKERS
+    UI <--> STORAGE
+    
+    classDef browser fill:#e1f5fe
+    classDef server fill:#f3e5f5
+    classDef external fill:#fff3e0
+    
+    class UI,MIC,SPEAKERS,STORAGE,WSR,WSS browser
+    class EXPRESS,ROUTES server
+    class OPENAI external
+```
+
+### Поток взаимодействия компонентов
+
+```mermaid
+sequenceDiagram
+    participant Пользователь
+    participant Фронтенд
+    participant SpeechAPI
+    participant Бэкенд
+    participant OpenAI
+    participant VoiceAPI
+    
+    Пользователь->>Фронтенд: Начать запись
+    Фронтенд->>SpeechAPI: Инициализация распознавания
+    SpeechAPI->>Пользователь: Запрос разрешения микрофона
+    Пользователь->>SpeechAPI: Предоставление разрешения
+    
+    loop Обработка в реальном времени
+        Пользователь->>SpeechAPI: Говорит
+        SpeechAPI->>Фронтенд: Транскрибированный текст
+        Фронтенд->>Бэкенд: Запрос перевода
+        Бэкенд->>OpenAI: API вызов
+        OpenAI->>Бэкенд: Переведенный текст
+        Бэкенд->>Фронтенд: Ответ с переводом
+        Фронтенд->>VoiceAPI: Синтез речи
+        VoiceAPI->>Пользователь: Аудио вывод
+    end
+    
+    Пользователь->>Фронтенд: Остановить запись
+    Фронтенд->>Фронтенд: Опции экспорта/сохранения
+```
+
+### Технологический стек
+
+#### Фронтенд
 - **React 18** с TypeScript для типобезопасности
 - **Vite** для быстрой разработки и сборки
 - **Tailwind CSS + Shadcn UI** для современного, адаптивного дизайна
@@ -42,7 +121,7 @@
 - **localStorage** для сохранения настроек
 - **TanStack Query** для управления состоянием API
 
-### Бэкенд
+#### Бэкенд
 - **Node.js + Express** для легкого HTTP сервера
 - **Интеграция с OpenAI API** для сервисов перевода
 - **TypeScript** для типобезопасности всего стека

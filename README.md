@@ -33,7 +33,86 @@ A browser-based real-time speech translation application that captures audio, tr
 
 ## Architecture
 
-### Frontend
+### System Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "Browser Environment"
+        UI[React Frontend]
+        MIC[Microphone]
+        SPEAKERS[Speakers]
+        STORAGE[localStorage]
+        
+        subgraph "Web APIs"
+            WSR[Web Speech Recognition API]
+            WSS[Web Speech Synthesis API]
+        end
+    end
+    
+    subgraph "Application Server"
+        EXPRESS[Express.js Server]
+        ROUTES[API Routes]
+    end
+    
+    subgraph "External Services"
+        OPENAI[OpenAI API]
+    end
+    
+    MIC --> WSR
+    WSR --> UI
+    UI --> EXPRESS
+    EXPRESS --> ROUTES
+    ROUTES --> OPENAI
+    OPENAI --> ROUTES
+    ROUTES --> EXPRESS
+    EXPRESS --> UI
+    UI --> WSS
+    WSS --> SPEAKERS
+    UI <--> STORAGE
+    
+    classDef browser fill:#e1f5fe
+    classDef server fill:#f3e5f5
+    classDef external fill:#fff3e0
+    
+    class UI,MIC,SPEAKERS,STORAGE,WSR,WSS browser
+    class EXPRESS,ROUTES server
+    class OPENAI external
+```
+
+### Component Interaction Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant SpeechAPI
+    participant Backend
+    participant OpenAI
+    participant VoiceAPI
+    
+    User->>Frontend: Start Recording
+    Frontend->>SpeechAPI: Initialize Recognition
+    SpeechAPI->>User: Request Mic Permission
+    User->>SpeechAPI: Grant Permission
+    
+    loop Real-time Processing
+        User->>SpeechAPI: Speaks
+        SpeechAPI->>Frontend: Transcribed Text
+        Frontend->>Backend: Translation Request
+        Backend->>OpenAI: API Call
+        OpenAI->>Backend: Translated Text
+        Backend->>Frontend: Translation Response
+        Frontend->>VoiceAPI: Synthesize Speech
+        VoiceAPI->>User: Audio Output
+    end
+    
+    User->>Frontend: Stop Recording
+    Frontend->>Frontend: Export/Save Options
+```
+
+### Technology Stack
+
+#### Frontend
 - **React 18** with TypeScript for type safety
 - **Vite** for fast development and builds
 - **Tailwind CSS + Shadcn UI** for modern, responsive design
@@ -42,7 +121,7 @@ A browser-based real-time speech translation application that captures audio, tr
 - **localStorage** for settings persistence
 - **TanStack Query** for API state management
 
-### Backend
+#### Backend
 - **Node.js + Express** for lightweight HTTP server
 - **OpenAI API** integration for translation services
 - **TypeScript** for full-stack type safety
